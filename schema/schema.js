@@ -1,8 +1,16 @@
 const graphql = require("graphql");
 
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID } = graphql;
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLSchema,
+  GraphQLID,
+  GraphQLBoolean,
+  GraphQLFloat,
+  GraphQLList,
+} = graphql;
 
-const { operatorData } = require("./tempdata");
+const { operatorData, phoneData, paymentData } = require("./tempdata");
 
 const MOperatorType = new GraphQLObjectType({
   name: "operator",
@@ -11,7 +19,7 @@ const MOperatorType = new GraphQLObjectType({
     name: { type: GraphQLString },
     nameInternational: { type: GraphQLString },
     color: { type: GraphQLString },
-    commission: { type: GraphQLString },
+    commission: { type: GraphQLFloat },
     logoPath: { type: GraphQLString },
   }),
 });
@@ -19,19 +27,36 @@ const MOperatorType = new GraphQLObjectType({
 const PhoneType = new GraphQLObjectType({
   name: "phone",
   fields: () => ({
-    number: { type: GraphQLString },
-    operator: { type: GraphQLString },
-    registrationDate: { type: GraphQLString },
+    number: { type: GraphQLID },
+    payment: {
+      type: new GraphQLList(PaymentType),
+      resolve(parent, args) {
+        return paymentData.filter((pay) => pay.number == parent.number);
+      },
+    },
+    operator: {
+      type: MOperatorType,
+      resolve(parent, args) {
+        return operatorData.find((operMob) => operMob.id == parent.operator);
+      },
+    },
+    firstPayDate: { type: GraphQLString },
   }),
 });
 
 const PaymentType = new GraphQLObjectType({
   name: "payment",
   fields: () => ({
-    number: { type: GraphQLString },
-    date: { type: GraphQLString },
-    sum: { type: GraphQLString },
-    status: { type: GraphQLString },
+    id: { type: GraphQLID },
+    number: {
+      type: PhoneType,
+      resolve(parent, args) {
+        return phoneData.find((phone) => (phone.number = parent.number));
+      },
+    },
+    time: { type: GraphQLString },
+    amounthPay: { type: GraphQLString },
+    status: { type: GraphQLBoolean },
   }),
 });
 
@@ -45,16 +70,34 @@ const Query = new GraphQLObjectType({
         return operatorData.find((mobOper) => mobOper.id == args.id);
       },
     },
+    operator: {
+      type: new GraphQLList(MOperatorType),
+      resolve(parent, args) {
+        return operatorData;
+      },
+    },
+
     phone: {
       type: PhoneType,
-      args: { phonenumber: { type: GraphQLString } },
-      resolve(parent, args) {},
+      args: { number: { type: GraphQLID } },
+      resolve(parent, args) {
+        return phoneData.find((phone) => phone.number == args.number);
+      },
+    },
+
+    phone: {
+      type: new GraphQLList(PhoneType),
+      resolve(parent, args) {
+        return phoneData;
+      },
     },
 
     payment: {
       type: PaymentType,
-      args: { phonenumber: { type: GraphQLString } },
-      resolve(parent, args) {},
+      args: { id: { type: GraphQLID } },
+      resolve(parent, args) {
+        return paymentData.find((pay) => pay.id == args.id);
+      },
     },
   },
 });

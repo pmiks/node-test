@@ -1,6 +1,6 @@
 const operatorData = [
   {
-    id: "1",
+    id: 1,
     name: "МТС",
     nameInternational: "mts",
     color: "red",
@@ -8,7 +8,7 @@ const operatorData = [
     logoPath: "",
   },
   {
-    id: "2",
+    id: 2,
     name: "Мегафон",
     nameInternational: "Megafon",
     color: "green",
@@ -28,17 +28,17 @@ const operatorData = [
 phoneData = [
   {
     number: "9124416966",
-    operator: "1",
+    operator: 1,
     firstPayData: "",
   },
   {
     number: "9124416969",
-    operator: "1",
+    operator: 1,
     firstPayData: "",
   },
   {
     number: "9204416966",
-    operator: "2",
+    operator: 2,
     firstPayData: "",
   },
 ];
